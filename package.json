@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "cross-env NODE_ENV=development ts-node ./src/bin/www nodemon --watch src/**/* -e ts,tsx --exec",
     "build": "tsc -P tsconfig.json --declaration false --sourceMap false",
-    "start:prod": "pm2 start ecosystem.config.js --env production --name 'modian-service'",
+    "start:prod": "pm2 start ecosystem.config.js --env production",
     "start:docker": "cross-env NODE_ENV=production pm2-docker start ./build/bin/www.js"
   },
   "pre-commit": [

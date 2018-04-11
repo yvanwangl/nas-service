@@ -1,9 +1,9 @@
 module.exports = {
     apps: [
         {
-            name: "recatch-service",
+            name: "modian-service",
             script: "./build/bin/www.js",
-            watch: true,
+            watch: false,
             env: {
                 "SERVER_PORT": 8090,
                 "NODE_ENV": "development"
