@@ -18,7 +18,7 @@ class DocsListController {
         let { userId, admin } = ctx.session.userInfo;
         let docsList = [];
         if (userId) {
-            docsList = await DocsInfo.find({});
+            docsList = await DocsInfo.find({}).sort('-createInstance');
             await Promise.all(docsList.map(async docs => {
                 let docsName = await DocsName.find({ _id: docs.docsNameId });
                 docs['docsName'] = docsName[0].name;
