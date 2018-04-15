@@ -1,6 +1,7 @@
 import { Path, GET, POST, PUT, BodyParam, CtxParam, PathParam } from 'iwinter';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as rimraf from 'rimraf';
 import Email from '../email';
 import DocsName from '../models/DocsName';
 import DocsInfo from '../models/DocsInfo';
@@ -55,8 +56,9 @@ class SubmitDocsInfoController {
 
         //查找是否已经有该文档
         let docsInfoList = await DocsInfo.find({ docsNameId: docsInfo.docsNameId });
+        const zipFile = path.join(pathToPublicFiles, docsInfo.filename);
         const docsNameDir = path.resolve(pathToPublicFiles, '../', docsInfo.docsNameId);
-        const docsVersionDir = path.join(pathToPublicFiles, '../', docsInfo.docsNameId, docsInfo.docsVersion);
+        const docsVersionDir = path.resolve(docsNameDir, docsInfo.docsVersion);
         const docsRealName = docsInfo.upload[0].name;
         const codsRealExt = path.extname(docsRealName);
         const docsRealDir = path.join(docsVersionDir, docsRealName.slice(0, -codsRealExt.length));
@@ -70,12 +72,13 @@ class SubmitDocsInfoController {
         fs.mkdirSync(docsVersionDir);
         //生成访问路径
         let docsLink = `http://${host}:${port}/${docsInfo.docsNameId}/${docsInfo.docsVersion}/index.html`;
-        fs.createReadStream(path.join(pathToPublicFiles, docsInfo.filename))
+        fs.createReadStream(zipFile)
             .pipe(unzip.Extract({ path: docsVersionDir }))
             .on('close', function () {
-                //将上传的文件夹删除, 将
                 copydir.sync(docsRealDir, docsVersionDir);
-                //fs.rmdirSync(docsRealDir);
+                //将上传的zip 文件删除，将解压包删除                
+                rimraf(docsRealDir, ()=> {});
+                fs.unlink(zipFile, () => {});
             });
 
 
@@ -84,6 +87,7 @@ class SubmitDocsInfoController {
 
             let newDocsInfo = new DocsInfo({
                 ...docsInfo,
+                createInstance: new Date(),
                 versions: [{
                     version: docsInfo.docsVersion,
                     filename: docsInfo.filename,
@@ -95,6 +99,12 @@ class SubmitDocsInfoController {
             return buildResponse(null, result);
         }
         let targetDocsInfo = docsInfoList[0];
+        let preVersions = targetDocsInfo.versions;
+        if(preVersions.length == 5) {
+            let lastVersion = preVersions.pop();
+            //删除过期的版本，版本只保留最近 5 个
+            rimraf(path.resolve(docsNameDir, lastVersion.version), ()=>{});
+        }
         let otherresult = await DocsInfo.findByIdAndUpdate(targetDocsInfo._id, {
             $set: {
                 versions: [
@@ -104,7 +114,7 @@ class SubmitDocsInfoController {
                         link: docsLink,
                         createInstance: new Date()
                     },
-                    ...targetDocsInfo.versions
+                    ...preVersions
                 ]
             }
         }, { new: true });
