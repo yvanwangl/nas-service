@@ -4,6 +4,7 @@ import DocsName from '../models/DocsName';
 import DocsInfo from '../models/DocsInfo';
 import { userLoginAuth } from '../auth';
 import { buildResponse } from '../utils';
+import DocsType from '../models/DocsType';
 
 
 @Path('/api/docsList', userLoginAuth)
@@ -19,8 +20,14 @@ class DocsListController {
         let docsList = [];
         if (userId) {
             docsList = await DocsInfo.find({}).sort('-createInstance');
+            // 填充文档名称
             await Promise.all(docsList.map(async docs => {
                 let docsName = await DocsName.find({ _id: docs.docsNameId });
+                // 填充文档类型
+                await Promise.all(docs.docsTypes.map(async docsType => {
+                    let targetDocsType = await DocsType.find({ _id: docsType.docsTypeId});
+                    docsType['docsTypeName'] = targetDocsType[0].name;
+                }));
                 docs['docsName'] = docsName[0].name;
             }));
         }

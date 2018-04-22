@@ -8,11 +8,17 @@ let VersionSchema = new Schema({
     createInstance: Date
 });
 
+let DocsTypeSchema = new Schema({
+    docsTypeId: String,
+    docsTypeName: String,
+    versions: [VersionSchema]
+});
+
 
 let docsInfoSchema = new Schema({
     docsNameId: String,
     docsName: String,
-    versions: [VersionSchema],
+    docsTypes: [DocsTypeSchema],
     createInstance: Date,
     userId: String
 });
