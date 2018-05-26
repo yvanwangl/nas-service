@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
         {
-            name: "modian-service",
+            name: "nas-service",
             script: "./build/bin/www.js",
             watch: false,
             env: {
