@@ -5,11 +5,11 @@ module.exports = {
             script: "./build/bin/www.js",
             watch: false,
             env: {
-                "SERVER_PORT": 8022,
+                "SERVER_PORT": 8030,
                 "NODE_ENV": "development"
             },
             env_production: {
-                "SERVER_PORT": 8022,
+                "SERVER_PORT": 8030,
                 "NODE_ENV": "production",
                 "MONGODB_HOST": 'localhost',
                 "MONGODB_DATABASE":'naswiki',
