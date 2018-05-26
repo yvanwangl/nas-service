@@ -8,11 +8,11 @@ import * as koaBody from 'koa-body';
 import * as koaSession from 'koa-session';
 //import controller from './controller';
 import IWinter from 'iwinter';
-import connectMongoose from './database';
+//import connectMongoose from './database';
 
 const app = new Koa();
 //connect to mongodb
-connectMongoose();
+//connectMongoose();
 
 //cros config
 //开发模式设置跨域
